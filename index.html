@@ -448,7 +448,7 @@
 
         function loadData() {
             // Load from Firebase with real-time sync
-            tournamentRef.on('value', (snapshot) => {
+            tournamentRef.once('value', (snapshot) => {
                 const data = snapshot.val();
                 if (!data) return;
                 
@@ -504,7 +504,7 @@
             clearTimeout(saveTimeout);
             saveTimeout = setTimeout(() => {
                 saveData();
-            }, 500);
+            }, 800);
         }
 
         function updateMatchNames() {
