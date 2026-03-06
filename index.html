@@ -494,10 +494,17 @@
             }
         }
 
+        let saveTimeout;
+        
         function updateAll() {
             updateMatchNames();
             updateTable();
-            saveData();
+            
+            // Debounce save - wait 500ms after last change
+            clearTimeout(saveTimeout);
+            saveTimeout = setTimeout(() => {
+                saveData();
+            }, 500);
         }
 
         function updateMatchNames() {
@@ -612,7 +619,7 @@
             initPlayers();
             initMatches();
             loadData();
-            updateAll();
+            // Don't call updateAll() here - loadData() will handle initial display
         });
     </script>
 </body>
