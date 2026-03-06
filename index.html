@@ -263,10 +263,13 @@
     <div class="container">
         <h1>⚽ Lighters Cup</h1>
         
-        <div style="text-align: center; margin-bottom: 20px;">
+        <div style="text-align: center; margin-bottom: 20px; display: flex; gap: 10px; justify-content: center; align-items: center;">
             <button onclick="resetTournament()" style="background: #ef4444; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600;">
                 🔄 Resetuj Turniej
             </button>
+            <div id="firebaseStatus" style="padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 600; background: #22c55e; color: white;">
+                🔥 Połączono z Firebase
+            </div>
         </div>
 
         <div class="section">
@@ -300,7 +303,26 @@
         </div>
     </div>
 
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDjJu57j4ybx4Va7bGjGAQypewAFdBBMbo",
+            authDomain: "lighters-cup.firebaseapp.com",
+            databaseURL: "https://lighters-cup-default-rtdb.firebaseio.com",
+            projectId: "lighters-cup",
+            storageBucket: "lighters-cup.firebasestorage.app",
+            messagingSenderId: "194179690969",
+            appId: "1:194179690969:web:960c1e02f3377107b369c8",
+            measurementId: "G-0895SMFN88"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const tournamentRef = database.ref('tournament');
+
         const players = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
         const playerNames = {};
         const playerTeams = {};
@@ -407,40 +429,48 @@
                 };
             });
             
-            localStorage.setItem('tournamentData', JSON.stringify(data));
+            // Save to Firebase
+            tournamentRef.set(data).catch(error => {
+                console.error('Firebase save error:', error);
+            });
         }
 
         function loadData() {
-            const saved = localStorage.getItem('tournamentData');
-            if (!saved) return;
-            
-            try {
-                const data = JSON.parse(saved);
+            // Load from Firebase with real-time sync
+            tournamentRef.on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (!data) return;
                 
-                players.forEach(player => {
-                    if (data.players[player]) {
-                        document.getElementById(`player-${player}`).value = data.players[player].name || '';
-                        document.getElementById(`team-${player}`).value = data.players[player].team || '';
-                    }
-                });
-                
-                matches.forEach(match => {
-                    if (data.matches[match.id]) {
-                        document.getElementById(`match-${match.id}-scoreA`).value = data.matches[match.id].scoreA || '';
-                        document.getElementById(`match-${match.id}-scoreB`).value = data.matches[match.id].scoreB || '';
-                    }
-                });
-                
-                updateAll();
-            } catch (e) {
-                console.error('Error loading data:', e);
-            }
+                try {
+                    players.forEach(player => {
+                        if (data.players && data.players[player]) {
+                            document.getElementById(`player-${player}`).value = data.players[player].name || '';
+                            document.getElementById(`team-${player}`).value = data.players[player].team || '';
+                        }
+                    });
+                    
+                    matches.forEach(match => {
+                        if (data.matches && data.matches[match.id]) {
+                            document.getElementById(`match-${match.id}-scoreA`).value = data.matches[match.id].scoreA || '';
+                            document.getElementById(`match-${match.id}-scoreB`).value = data.matches[match.id].scoreB || '';
+                        }
+                    });
+                    
+                    updateAll();
+                } catch (e) {
+                    console.error('Error loading data:', e);
+                }
+            });
         }
 
         function resetTournament() {
             if (confirm('Czy na pewno chcesz zresetować cały turniej? Wszystkie dane zostaną usunięte.')) {
-                localStorage.removeItem('tournamentData');
-                location.reload();
+                tournamentRef.set({}).then(() => {
+                    location.reload();
+                }).catch(error => {
+                    console.error('Reset error:', error);
+                    alert('Błąd podczas resetowania. Sprawdź połączenie.');
+                });
             }
         }
 
