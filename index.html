@@ -3,10 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lighters Cup - Live Sync</title>
-    <!-- Firebase SDK v10 -->
-    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
+    <title>Lighters Cup</title>
     <style>
         :root {
             --color-bg-primary: #0f172a;
@@ -413,6 +410,8 @@
         }
 
         function saveData() {
+            if (isLoading) return;
+            
             const data = {
                 players: {},
                 matches: {}
@@ -433,10 +432,19 @@
             });
             
             // Save to Firebase
-            tournamentRef.set(data).catch(error => {
+            tournamentRef.set(data).then(() => {
+                document.getElementById('firebaseStatus').textContent = '🔥 Zapisano';
+                setTimeout(() => {
+                    document.getElementById('firebaseStatus').textContent = '🔥 Połączono z Firebase';
+                }, 1000);
+            }).catch(error => {
                 console.error('Firebase save error:', error);
+                document.getElementById('firebaseStatus').textContent = '❌ Błąd zapisu';
+                document.getElementById('firebaseStatus').style.background = '#ef4444';
             });
         }
+
+        let isLoading = false;
 
         function loadData() {
             // Load from Firebase with real-time sync
@@ -444,24 +452,33 @@
                 const data = snapshot.val();
                 if (!data) return;
                 
+                isLoading = true;
+                
                 try {
                     players.forEach(player => {
                         if (data.players && data.players[player]) {
-                            document.getElementById(`player-${player}`).value = data.players[player].name || '';
-                            document.getElementById(`team-${player}`).value = data.players[player].team || '';
+                            const nameInput = document.getElementById(`player-${player}`);
+                            const teamInput = document.getElementById(`team-${player}`);
+                            if (nameInput) nameInput.value = data.players[player].name || '';
+                            if (teamInput) teamInput.value = data.players[player].team || '';
                         }
                     });
                     
                     matches.forEach(match => {
                         if (data.matches && data.matches[match.id]) {
-                            document.getElementById(`match-${match.id}-scoreA`).value = data.matches[match.id].scoreA || '';
-                            document.getElementById(`match-${match.id}-scoreB`).value = data.matches[match.id].scoreB || '';
+                            const scoreAInput = document.getElementById(`match-${match.id}-scoreA`);
+                            const scoreBInput = document.getElementById(`match-${match.id}-scoreB`);
+                            if (scoreAInput) scoreAInput.value = data.matches[match.id].scoreA || '';
+                            if (scoreBInput) scoreBInput.value = data.matches[match.id].scoreB || '';
                         }
                     });
                     
-                    updateAll();
+                    updateMatchNames();
+                    updateTable();
                 } catch (e) {
                     console.error('Error loading data:', e);
+                } finally {
+                    isLoading = false;
                 }
             });
         }
