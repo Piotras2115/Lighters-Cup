@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lighters Cup</title>
+    <style>
+        :root {
+            --color-bg-primary: #0f172a;
+            --color-bg-secondary: #1e293b;
+            --color-bg-tertiary: #334155;
+            --color-text-primary: #f1f5f9;
+            --color-text-secondary: #cbd5e1;
+            --color-accent: #38bdf8;
+            --color-accent-hover: #0284c7;
+            --color-success: #22c55e;
+            --color-warning: #f59e0b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--color-bg-primary);
+            color: var(--color-text-primary);
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--color-accent);
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+        }
+
+        .section {
+            background: var(--color-bg-secondary);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .section-title {
+            color: var(--color-accent);
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--color-accent);
+            padding-bottom: 10px;
+        }
+
+        .players-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .player-input {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .player-input label {
+            color: var(--color-text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        input[type="text"], input[type="number"] {
+            background: var(--color-bg-tertiary);
+            border: 1px solid #475569;
+            color: var(--color-text-primary);
+            padding: 10px 12px;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus, input[type="number"]:focus {
+            outline: none;
+            border-color: var(--color-accent);
+        }
+
+        .match-card {
+            background: var(--color-bg-tertiary);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--color-accent);
+        }
+
+        .match-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .match-number {
+            font-weight: 600;
+            color: var(--color-accent);
+            font-size: 1.1rem;
+        }
+
+        .match-teams {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 20px;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .team {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .team-label {
+            font-size: 0.85rem;
+            color: var(--color-text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .team-players {
+            font-size: 1rem;
+            color: var(--color-text-primary);
+            font-weight: 500;
+        }
+
+        .vs {
+            color: var(--color-accent);
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .match-score {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .score-input {
+            width: 100%;
+        }
+
+        .score-input input {
+            width: 100%;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--color-bg-tertiary);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        thead {
+            background: var(--color-bg-primary);
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+        }
+
+        th {
+            color: var(--color-accent);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            border-top: 1px solid #475569;
+        }
+
+        tr:hover {
+            background: rgba(56, 189, 248, 0.05);
+        }
+
+        .rank {
+            font-weight: 700;
+            color: var(--color-accent);
+            font-size: 1.2rem;
+        }
+
+        .rank-1 { color: #fbbf24; }
+        .rank-2 { color: #cbd5e1; }
+        .rank-3 { color: #fb923c; }
+
+        .stat-number {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .wins {
+            color: var(--color-success);
+        }
+
+        .losses {
+            color: #ef4444;
+        }
+
+        .points {
+            color: var(--color-accent);
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .winner-indicator {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            background: var(--color-success);
+            color: white;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .match-teams {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .vs {
+                text-align: center;
+            }
+
+            .match-score {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚽ Lighters Cup</h1>
+        
+        <div style="text-align: center; margin-bottom: 20px;">
+            <button onclick="resetTournament()" style="background: #ef4444; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600;">
+                🔄 Resetuj Turniej
+            </button>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">Gracze i Wylosowane Drużyny</h2>
+            <div class="players-grid" id="playersGrid"></div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">Mecze (14 meczów)</h2>
+            <div id="matchesContainer"></div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">Tabela Końcowa</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Miejsce</th>
+                            <th>Gracz</th>
+                            <th>Drużyna</th>
+                            <th>Zwycięstwa</th>
+                            <th>Remisy</th>
+                            <th>Porażki</th>
+                            <th>Punkty</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const players = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+        const playerNames = {};
+        const playerTeams = {};
+        
+        const matches = [
+            { id: 1, teamA: ['A', 'B'], teamB: ['C', 'D'] },
+            { id: 2, teamA: ['E', 'F'], teamB: ['G', 'H'] },
+            { id: 3, teamA: ['A', 'C'], teamB: ['E', 'G'] },
+            { id: 4, teamA: ['B', 'D'], teamB: ['F', 'H'] },
+            { id: 5, teamA: ['A', 'D'], teamB: ['F', 'G'] },
+            { id: 6, teamA: ['C', 'E'], teamB: ['B', 'H'] },
+            { id: 7, teamA: ['A', 'E'], teamB: ['D', 'H'] },
+            { id: 8, teamA: ['B', 'F'], teamB: ['C', 'G'] },
+            { id: 9, teamA: ['E', 'B'], teamB: ['D', 'G'] },
+            { id: 10, teamA: ['F', 'A'], teamB: ['C', 'H'] },
+            { id: 11, teamA: ['G', 'A'], teamB: ['D', 'F'] },
+            { id: 12, teamA: ['D', 'E'], teamB: ['F', 'C'] },
+            { id: 13, teamA: ['H', 'B'], teamB: ['C', 'E'] },
+            { id: 14, teamA: ['G', 'D'], teamB: ['A', 'F'] }
+        ];
+
+        function initPlayers() {
+            const grid = document.getElementById('playersGrid');
+            players.forEach(player => {
+                const div = document.createElement('div');
+                div.className = 'player-input';
+                div.innerHTML = `
+                    <label>Gracz ${player}</label>
+                    <input type="text" id="player-${player}" placeholder="Imię gracza" oninput="updateAll()">
+                    <input type="text" id="team-${player}" placeholder="Wylosowana drużyna" oninput="updateAll()">
+                `;
+                grid.appendChild(div);
+            });
+        }
+
+        function initMatches() {
+            const container = document.getElementById('matchesContainer');
+            matches.forEach(match => {
+                const div = document.createElement('div');
+                div.className = 'match-card';
+                div.innerHTML = `
+                    <div class="match-header">
+                        <span class="match-number">Mecz ${match.id}</span>
+                    </div>
+                    <div class="match-teams">
+                        <div class="team">
+                            <span class="team-label">Team A</span>
+                            <span class="team-players" id="match-${match.id}-teamA">
+                                ${match.teamA.map(p => `Gracz ${p}`).join(' + ')}
+                            </span>
+                            <span class="team-players" id="match-${match.id}-teamA-clubs" style="color: var(--color-text-secondary); font-size: 0.9rem; margin-top: 4px;"></span>
+                        </div>
+                        <span class="vs">VS</span>
+                        <div class="team">
+                            <span class="team-label">Team B</span>
+                            <span class="team-players" id="match-${match.id}-teamB">
+                                ${match.teamB.map(p => `Gracz ${p}`).join(' + ')}
+                            </span>
+                            <span class="team-players" id="match-${match.id}-teamB-clubs" style="color: var(--color-text-secondary); font-size: 0.9rem; margin-top: 4px;"></span>
+                        </div>
+                    </div>
+                    <div class="match-score">
+                        <div class="score-input">
+                            <input type="number" id="match-${match.id}-scoreA" min="0" placeholder="Wynik A" oninput="updateAll()">
+                        </div>
+                        <span class="vs">:</span>
+                        <div class="score-input">
+                            <input type="number" id="match-${match.id}-scoreB" min="0" placeholder="Wynik B" oninput="updateAll()">
+                        </div>
+                    </div>
+                    <div id="match-${match.id}-winner"></div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function getPlayerName(letter) {
+            const input = document.getElementById(`player-${letter}`);
+            return input.value.trim() || `Gracz ${letter}`;
+        }
+
+        function getPlayerTeam(letter) {
+            const input = document.getElementById(`team-${letter}`);
+            return input.value.trim() || '';
+        }
+
+        function saveData() {
+            const data = {
+                players: {},
+                matches: {}
+            };
+            
+            players.forEach(player => {
+                data.players[player] = {
+                    name: document.getElementById(`player-${player}`).value,
+                    team: document.getElementById(`team-${player}`).value
+                };
+            });
+            
+            matches.forEach(match => {
+                data.matches[match.id] = {
+                    scoreA: document.getElementById(`match-${match.id}-scoreA`).value,
+                    scoreB: document.getElementById(`match-${match.id}-scoreB`).value
+                };
+            });
+            
+            localStorage.setItem('tournamentData', JSON.stringify(data));
+        }
+
+        function loadData() {
+            const saved = localStorage.getItem('tournamentData');
+            if (!saved) return;
+            
+            try {
+                const data = JSON.parse(saved);
+                
+                players.forEach(player => {
+                    if (data.players[player]) {
+                        document.getElementById(`player-${player}`).value = data.players[player].name || '';
+                        document.getElementById(`team-${player}`).value = data.players[player].team || '';
+                    }
+                });
+                
+                matches.forEach(match => {
+                    if (data.matches[match.id]) {
+                        document.getElementById(`match-${match.id}-scoreA`).value = data.matches[match.id].scoreA || '';
+                        document.getElementById(`match-${match.id}-scoreB`).value = data.matches[match.id].scoreB || '';
+                    }
+                });
+                
+                updateAll();
+            } catch (e) {
+                console.error('Error loading data:', e);
+            }
+        }
+
+        function resetTournament() {
+            if (confirm('Czy na pewno chcesz zresetować cały turniej? Wszystkie dane zostaną usunięte.')) {
+                localStorage.removeItem('tournamentData');
+                location.reload();
+            }
+        }
+
+        function updateAll() {
+            updateMatchNames();
+            updateTable();
+            saveData();
+        }
+
+        function updateMatchNames() {
+            matches.forEach(match => {
+                const teamAEl = document.getElementById(`match-${match.id}-teamA`);
+                const teamBEl = document.getElementById(`match-${match.id}-teamB`);
+                const teamAClubsEl = document.getElementById(`match-${match.id}-teamA-clubs`);
+                const teamBClubsEl = document.getElementById(`match-${match.id}-teamB-clubs`);
+                const winnerEl = document.getElementById(`match-${match.id}-winner`);
+                
+                teamAEl.textContent = match.teamA.map(p => getPlayerName(p)).join(' + ');
+                teamBEl.textContent = match.teamB.map(p => getPlayerName(p)).join(' + ');
+                
+                const teamAClub = getPlayerTeam(match.teamA[0]);
+                const teamBClub = getPlayerTeam(match.teamB[0]);
+                teamAClubsEl.textContent = teamAClub ? `(${teamAClub})` : '';
+                teamBClubsEl.textContent = teamBClub ? `(${teamBClub})` : '';
+
+                const scoreA = parseInt(document.getElementById(`match-${match.id}-scoreA`).value) || null;
+                const scoreB = parseInt(document.getElementById(`match-${match.id}-scoreB`).value) || null;
+
+                if (scoreA !== null && scoreB !== null) {
+                    if (scoreA > scoreB) {
+                        winnerEl.innerHTML = `<div class="winner-indicator">🏆 Zwycięzcy: ${match.teamA.map(p => getPlayerName(p)).join(' + ')}</div>`;
+                    } else if (scoreB > scoreA) {
+                        winnerEl.innerHTML = `<div class="winner-indicator">🏆 Zwycięzcy: ${match.teamB.map(p => getPlayerName(p)).join(' + ')}</div>`;
+                    } else {
+                        winnerEl.innerHTML = `<div class="winner-indicator" style="background: var(--color-warning);">🤝 Remis - po 1 punkcie dla każdego</div>`;
+                    }
+                } else {
+                    winnerEl.innerHTML = '';
+                }
+            });
+        }
+
+        function calculateStats() {
+            const stats = {};
+            
+            players.forEach(player => {
+                stats[player] = {
+                    name: getPlayerName(player),
+                    team: getPlayerTeam(player),
+                    wins: 0,
+                    losses: 0,
+                    draws: 0,
+                    points: 0
+                };
+            });
+
+            matches.forEach(match => {
+                const scoreA = parseInt(document.getElementById(`match-${match.id}-scoreA`).value);
+                const scoreB = parseInt(document.getElementById(`match-${match.id}-scoreB`).value);
+
+                if (!isNaN(scoreA) && !isNaN(scoreB)) {
+                    if (scoreA > scoreB) {
+                        match.teamA.forEach(p => {
+                            stats[p].wins++;
+                            stats[p].points += 3;
+                        });
+                        match.teamB.forEach(p => {
+                            stats[p].losses++;
+                        });
+                    } else if (scoreB > scoreA) {
+                        match.teamB.forEach(p => {
+                            stats[p].wins++;
+                            stats[p].points += 3;
+                        });
+                        match.teamA.forEach(p => {
+                            stats[p].losses++;
+                        });
+                    } else {
+                        // Remis - każdy dostaje 1 punkt
+                        match.teamA.forEach(p => {
+                            stats[p].draws++;
+                            stats[p].points += 1;
+                        });
+                        match.teamB.forEach(p => {
+                            stats[p].draws++;
+                            stats[p].points += 1;
+                        });
+                    }
+                }
+            });
+
+            return Object.entries(stats)
+                .map(([letter, data]) => ({ letter, ...data }))
+                .sort((a, b) => b.points - a.points || b.wins - a.wins);
+        }
+
+        function updateTable() {
+            const tbody = document.getElementById('tableBody');
+            const sortedStats = calculateStats();
+            
+            tbody.innerHTML = '';
+            sortedStats.forEach((player, index) => {
+                const row = document.createElement('tr');
+                const rankClass = index === 0 ? 'rank-1' : index === 1 ? 'rank-2' : index === 2 ? 'rank-3' : '';
+                row.innerHTML = `
+                    <td><span class="rank ${rankClass}">${index + 1}</span></td>
+                    <td><strong>${player.name}</strong></td>
+                    <td>${player.team || '-'}</td>
+                    <td><span class="stat-number wins">${player.wins}</span></td>
+                    <td><span class="stat-number" style="color: var(--color-warning);">${player.draws}</span></td>
+                    <td><span class="stat-number losses">${player.losses}</span></td>
+                    <td><span class="stat-number points">${player.points}</span></td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initPlayers();
+            initMatches();
+            loadData();
+            updateAll();
+        });
+    </script>
+</body>
+</html>
